@@ -23,6 +23,10 @@
   "maintainers": [
     "William Wall <wwall@caci.com>"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngageoint/opensphere-asm.git"
+  },
   "config": {
     "commitizen": {
       "path": "node_modules/cz-conventional-changelog"
