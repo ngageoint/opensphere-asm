@@ -1,6 +1,6 @@
-# Open Sphere ASM
+# OpenSphere ASM
 
-WebAssembly and asm.js module for [Open Sphere](https://github.com/ngageoint/opensphere). Built with
+WebAssembly and asm.js module for [OpenSphere](https://github.com/ngageoint/opensphere). Built with
 [emscripten](https://github.com/kripken/emscripten).
 
 These modules are primarily used to expose functions for the geodesic
@@ -26,7 +26,7 @@ tl;dr: You need a working compiler chain, java, python, and git.
 
 Run `npm run build` or `./build.sh`
 
-The build is intended to be consumed by the [Open Sphere](https://github.com/ngageoint/opensphere)
+The build is intended to be consumed by the [OpenSphere](https://github.com/ngageoint/opensphere)
 web application. However, it is definitely possible to run similar `emcc` commands
 to produce WebAssembly or asm.js for nodejs.
 
