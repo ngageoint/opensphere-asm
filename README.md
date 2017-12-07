@@ -1,6 +1,49 @@
-# opensphere-asm
+# Open Sphere ASM
 
-12/6/2017
+WebAssembly and asm.js module for [Open Sphere](https://github.com/ngageoint/opensphere). Built with
+[emscripten](https://github.com/kripken/emscripten).
+
+These modules are primarily used to expose functions for the geodesic
+direct/inverse problem, the rhumb direct/inverse problem, and MGRS conversions 
+provided by the excellent
+[GeographicLib](https://geographiclib.sourceforge.io/) by Charles Karney.
+The library includes a [partial JS port](https://www.npmjs.com/package/geographiclib)
+for the geodesic calculations, but not for the others. Another plus from this
+module is the increased performance over pure JS.
+
+## Prerequisites
+
+See [prerequisites for emscripten](https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html)
+
+tl;dr: You need a working compiler chain, java, python, and git.
+
+## Setup
+
+1. Run `./dev-install.sh` to set up the emscripten environment. You can run this over and over to update the emscripten SDK and GeographicLib.
+2. Run `npm install` to set up the tests
+
+## Build
+
+Run `npm run build` or `./build.sh`
+
+The build is intended to be consumed by the [Open Sphere](https://github.com/ngageoint/opensphere)
+web application. However, it is definitely possible to run similar `emcc` commands
+to produce WebAssembly or asm.js for nodejs.
+
+## Try it
+
+Point a browser at `example.html` and hit the test button.
+
+## Development
+
+Good candidates for additions to the ASM module:
+
+* More functions from GeographicLib as we need them
+* Heavy computations which are run many times
+
+Things to be careful of
+
+* Watch the gzipped file size of the output. It is easy to explode it by adding libraries with many dependencies
 
 ## About
 

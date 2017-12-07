@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<script src="dist/os-load.js"></script>
+<script>
+  function test() {
+    var s = new Date().getTime();
+    var n = 100000;
+
+    var p1 = [174.81, -41.32];
+    var p2 = [-5.50, 40.96];
+    var p3 = [115.74, -32.06];
+
+    var html = '';
+
+    // geodesic
+    for (var i = 0; i < n; i++) {
+      var r = osasm.geodesicInverse(p1, p2);
+    };
+    var e = new Date().getTime();
+    html += '<p>' + n + ' inverse iterations in ' + (e - s) + 'ms</p>';
+
+    s = new Date().getTime();
+
+    for (i = 0; i < n; i++) {
+      var r = osasm.geodesicDirect(p3, 225, 1500000);
+    }
+    e = new Date().getTime();
+    html += '<p>' + n + ' direct iterations in ' + (e - s) + 'ms</p>';
+
+
+    // rhumb
+    for (var i = 0; i < n; i++) {
+      var r = osasm.rhumbInverse(p1, p2);
+    };
+    var e = new Date().getTime();
+    html += '<p>' + n + ' rhumb inverse iterations in ' + (e - s) + 'ms</p>';
+
+    s = new Date().getTime();
+
+    for (i = 0; i < n; i++) {
+      var r = osasm.rhumbDirect(p3, 225, 1500000);
+    }
+    e = new Date().getTime();
+    html += '<p>' + n + ' rhumb direct iterations in ' + (e - s) + 'ms</p>';
+
+    document.getElementById('results').innerHTML = html;
+  }
+</script>
+<button onclick="test()">Test</button>
+<div id="results"></div>
