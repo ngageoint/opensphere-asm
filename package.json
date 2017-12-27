@@ -1,14 +1,19 @@
 {
   "name": "opensphere-asm",
   "version": "1.0.3",
-  "description": "WebAssembly and asm.js module for Open Sphere. Built with [emscripten](https://github.com/kripken/emscripten).",
+  "description": "WebAssembly and asm.js module for OpenSphere. Built with [emscripten](https://github.com/kripken/emscripten).",
   "main": "dist/os-load.js",
   "scripts": {
     "build": "./build.sh",
     "test": "karma start --single-run",
-    "commitmsg": "validate-commit-msg"
+    "commitmsg": "validate-commit-msg",
+    "semantic-release": "semantic-release"
   },
-  "files": ["README.md", "dist"],
+  "files": [
+    "README.md",
+    "example.html",
+    "dist"
+  ],
   "keywords": [
     "gis",
     "geodesic",
@@ -35,7 +40,34 @@
       "helpMessage": "\nPlease fix your commit message (consider using 'npm i -g commitizen'). Well-formatted commit messages allow us to automate our changelog.\n\nExamples:\n\"fix(binding): Fixed error in library usage\"\n\"feat(post): added window exposure\"\n\nIf you have installed commitizen, try running 'git cz'."
     }
   },
+  "release": {
+    "verifyConditions": [
+      "@semantic-release/condition-travis",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git"
+    ],
+    "getLastRelease": "@semantic-release/git",
+    "publish": [
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      {
+        "path": "@semantic-release/git",
+        "assets": [
+          "package.json",
+          "CHANGELOG.md"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      },
+      "@semantic-release/github"
+    ]
+  },
   "devDependencies": {
+    "@semantic-release/changelog": "^1.0.0",
+    "@semantic-release/condition-travis": "^7.1.3",
+    "@semantic-release/git": "^2.0.1",
+    "@semantic-release/github": "^3.0.0",
+    "@semantic-release/npm": "^2.5.0",
     "cz-conventional-changelog": "^1.2.0",
     "husky": "^0.13.3",
     "jasmine-core": "^2.6.2",
@@ -43,6 +75,7 @@
     "karma-chrome-launcher": "^2.1.1",
     "karma-jasmine": "^1.1.0",
     "karma-spec-reporter": "0.0.31",
-    "validate-commit-msg": "^2.8.2"
+    "validate-commit-msg": "^2.8.2",
+    "semantic-release": "^11.0.2"
   }
 }

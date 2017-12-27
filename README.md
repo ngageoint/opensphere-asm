@@ -32,7 +32,7 @@ to produce WebAssembly or asm.js for nodejs.
 
 ## Try it
 
-Point a browser at `example.html` and hit the test button.
+Point a browser at `example.html` (via an HTTP server, not file://)  and hit the test button.
 
 ## Development
 
