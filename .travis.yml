@@ -1,4 +1,5 @@
 language: node_js
+sudo: required
 env:
   global:
   - secure: X2CB2PKUOcavASFsvRe420ahdhheb35oHwzTchcdud+Vitrz16EUuFozCgY7yNdtIIBzkkpIaw+ZbkyQxK16o3R3LiygyEuAt/o2WtcDHm1ABh1Y89TwuqrWQBnaPoAV4LEBntlfL9YFWAafNansCinIcY4hqND6FvRxUowvUkV+aZ30Ao32hOG6+NnpnkiN3dtjLibnwSVPasGRfUmpg2fpU9c6+pW16axUDwp5iclRGJs6u3+J2g6CgdaJCwrguM9dgmMkFGXtNjkegwd75G6JlvK+jOeSOACaY51VJPQj54rEB5z1jZ2Mhy3GshAQ9zOO2I6cpaylTtIN8S+7LbpZvONuAjyXjcWTURuZsEnpWr5HeCRqftkXlG1Wr/AJscvn/6r0jjcmbnT3C/vJxgfKAuqvv8CFXXQBeV0Bqz+HvAdo7eoAIpLrsPSFrDxiR2E8zcyqhJh7lWs8YFcwzGltwYEk0QMGknHCeENh3dKrWgYOdOnOn4dhzx69/1GHN33FTIBgDSu07ySzTJzwdQNhPqxxeMaB00ABtG45euOzMzaB7lBjmXfsswDfTev6/kJSb2PkQrTOyfTXWj1x16USfyP70z6lo3yYz2llM9TjoxP7eYIjYcMFYnPb7kucCAR4xQdyP7E3SSpVdwVI6/ZPJQTpNmnqG6DN7SCowDY=
@@ -6,16 +7,23 @@ env:
 cache:
   directories:
   - "~/.npm"
-  - "~/.emscripten_cache"
 notifications:
   email: false
 node_js:
 - stable
 os:
 - linux
+services:
+- docker
+before_install:
+# set up a docker image with emscripten ready to go
+- docker run -dit --name emscripten -v $(pwd):/project trzeci/emscripten:sdk-incoming-64bit bash
 script:
-- "./dev-install.sh"
-- npm run build
+# install the library dependencies
+- ./ci-install.sh
+# run the build script on the docker image
+- docker exec -it emscripten ./build.sh
+# run tests locally
 - npm run test
 after_success:
 - npm run semantic-release
