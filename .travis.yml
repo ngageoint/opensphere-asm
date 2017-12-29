@@ -22,7 +22,7 @@ script:
 # install the library dependencies
 - ./ci-install.sh
 # run the build script on the docker image
-- docker exec -it emscripten ./build.sh
+- docker exec -it emscripten cd /project && ./build.sh
 # run tests locally
 - npm run test
 after_success:
