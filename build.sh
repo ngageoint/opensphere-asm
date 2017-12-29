@@ -14,8 +14,10 @@ SRC_ARGS="src/bindings.cpp $GEO_PATH/src/*.cpp"
 ASM_ARGS="--closure 1 -o dist/os-asm.js"
 WASM_ARGS="-s WASM=1 -o dist/os-wasm.js"
 
-# source the emscripten environment
-source tools/emsdk-portable/emsdk_env.sh
+if [[ -d "tools" ]]; then
+  # source the emscripten environment for dev builds
+  source tools/emsdk-portable/emsdk_env.sh
+fi
 
 echo "Building Web Assembly..."
 echo emcc $BASE_ARGS $WASM_ARGS $GEO_ARGS ... src

@@ -13,6 +13,8 @@ node_js:
 - stable
 os:
 - linux
+addons:
+  chrome: stable
 services:
 - docker
 before_install:
