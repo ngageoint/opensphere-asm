@@ -69,5 +69,3 @@ Module['postRun'] = [function() {
   Module['toMGRS'] = wrapSingle(Module['toMGRS']);
 }];
 window['osasm'] = Module;
-})();
-

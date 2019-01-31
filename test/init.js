@@ -5,15 +5,14 @@ describe('init', function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 5500;
   });
 
-  it('should wait for osasm module', function(done) {
-    if (!window.osasm) {
-      setTimeout(function() {
+  it('should wait for osasm module', function() {
+    waitsFor(function() {
+      return !!window.osasm && !!window.osasm.geodesicInverse;
+    }, 5000, 'osasm to load');
+
+    runs(function() {
         expect(!!osasm).toBe(true);
-        done();
-      }, 2000);
-    } else {
-      done();
-    }
+    });
   });
 
   afterEach(function() {
