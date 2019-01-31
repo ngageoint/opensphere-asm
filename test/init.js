@@ -6,13 +6,14 @@ describe('init', function() {
   });
 
   it('should wait for osasm module', function() {
-    waitsFor(function() {
-      return !!window.osasm && !!window.osasm.geodesicInverse;
-    }, 5000, 'osasm to load');
-
-    runs(function() {
-        expect(!!osasm).toBe(true);
-    });
+    if (!window.osasm) {
+      setTimeout(function() {
+        expect(!!window.osasm && !!window.osasm.geodesicInverse).toBe(true);
+        done();
+      }, 4000);
+    } else {
+      done();
+    }
   });
 
   afterEach(function() {
