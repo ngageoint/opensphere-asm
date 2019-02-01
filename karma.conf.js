@@ -8,6 +8,12 @@ module.exports = function(config) {
     // frameworks to use
     frameworks: ['jasmine'],
 
+    plugins: [
+      require('karma-jasmine'),
+      require('karma-chrome-launcher'),
+      require('karma-spec-reporter')
+    ],
+
     // list of files / patterns to load in the browser
     files: [
       {pattern: 'dist/os-asm.*', watched: false, included: false, served: true},
