@@ -13,7 +13,7 @@ describe('mgrs conversion', function() {
   it('should convert from mgrs to lon/lat', function() {
     var precision = 5;
 
-    var p = osasm.toLonLat('38NNF0000000064'); 
+    var p = osasm.toLonLat('38NNF0000000064');
     expect(p[0]).toBeCloseTo(45.0, precision);
     expect(p[1]).toBeCloseTo(0.00058, precision);
 
@@ -28,7 +28,7 @@ describe('mgrs conversion', function() {
     p = osasm.toLonLat('25XEN0416386465');
     expect(p[0]).toBeCloseTo(-32.66403230449777, precision);
     expect(p[1]).toBeCloseTo(83.62700, precision);
-  });  
+  });
 
   it('should support converting to polar regions', function() {
     var p = [-89, 89];
@@ -61,7 +61,7 @@ describe('mgrs conversion', function() {
     expect(p[0]).toBeCloseTo(-89.00009185943141, 5);
     expect(p[1]).toBeCloseTo(-89, 5);
   });
- 
+
   it('should not encounter rounding errors in coordinate conversion', function() {
     var tests = [
       '42QYM0127736076', '38SMB4414084706', '38NNF0000000064', '25XEN0416386465',
@@ -72,5 +72,10 @@ describe('mgrs conversion', function() {
       var result = osasm.toMGRS(lonlat);
       expect(result).toBe(test);
     });
+  });
+
+  it('should handle invalid coordinates', function() {
+    expect(osasm.toMGRS([0, -91])).toBe('INVALID');
+    expect(osasm.toMGRS([0, 91])).toBe('INVALID');
   });
 });
