@@ -93,9 +93,15 @@ std::string toMGRS(Coord p) {
   int zone;
   bool northp;
   double x, y;
-  UTMUPS::Forward(p.lat, p.lon, zone, northp, x, y);
   std::string mgrs;
-  MGRS::Forward(zone, northp, x, y, 5, mgrs);
+
+  if (abs(p.lat) > 90) {
+    mgrs = "INVALID";
+  } else {
+    UTMUPS::Forward(p.lat, p.lon, zone, northp, x, y);
+    MGRS::Forward(zone, northp, x, y, 5, mgrs);
+  }
+
   return mgrs;
 };
 
