@@ -95,6 +95,7 @@ std::string toMGRS(Coord p) {
   double x, y;
   std::string mgrs;
 
+  // GeographicLib will throw an error for latitudes outside +/- 90. return an INVALID string instead.
   if (abs(p.lat) > 90) {
     mgrs = "INVALID";
   } else {
