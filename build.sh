@@ -11,7 +11,7 @@ BASE_ARGS="--bind -O3 --pre-js src/prefix.js --post-js src/postfix.js --llvm-lto
   -s NO_FILESYSTEM=1 -I$GEO_PATH/include/"
 GEO_ARGS=""
 SRC_ARGS="src/bindings.cpp $GEO_PATH/src/*.cpp"
-ASM_ARGS="--closure 0 -o dist/os-asm.js"
+ASM_ARGS="-s WASM=0 --closure 0 -o dist/os-asm.js"
 WASM_ARGS="-s WASM=1 -o dist/os-wasm.js"
 
 if [[ -d "tools" ]]; then
