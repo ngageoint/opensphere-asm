@@ -15,7 +15,7 @@ services:
 - docker
 before_install:
 # set up a docker image with emscripten ready to go
-- docker run -dit --name emscripten -v $(pwd):/project trzeci/emscripten:sdk-incoming-64bit bash
+- docker run -dit --name emscripten -v $(pwd):/project trzeci/emscripten:latest bash
 script:
 # install the library dependencies
 - ./ci-install.sh
