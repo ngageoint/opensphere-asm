@@ -7,11 +7,13 @@ rm -rf dist/*
 cp src/load.js dist/os-load.js
 
 GEO_PATH=lib/geographiclib
+
 BASE_ARGS="--bind -O3 --pre-js src/prefix.js --post-js src/postfix.js --llvm-lto 1 \
   -s NO_FILESYSTEM=1 -I$GEO_PATH/include/"
 GEO_ARGS=""
 SRC_ARGS="src/bindings.cpp $GEO_PATH/src/*.cpp"
-ASM_ARGS="-s WASM=0 --closure 0 -o dist/os-asm.js"
+# The LEGACY_VM_SUPPORT is for asm.js output to work in IE11.
+ASM_ARGS="-s WASM=0 -s LEGACY_VM_SUPPORT=1 --closure 0 -o dist/os-asm.js"
 WASM_ARGS="-s WASM=1 -o dist/os-wasm.js"
 
 if [[ -d "tools" ]]; then
