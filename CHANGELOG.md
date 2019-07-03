@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/ngageoint/opensphere-asm/compare/v1.1.1...v1.1.2) (2019-07-03)
+
+
+### Bug Fixes
+
+* **asm.js:** add build flag to restore IE11 support ([4566fe1](https://github.com/ngageoint/opensphere-asm/commit/4566fe1)), closes [#4](https://github.com/ngageoint/opensphere-asm/issues/4)
+
 ## [1.1.1](https://github.com/ngageoint/opensphere-asm/compare/v1.1.0...v1.1.1) (2019-04-22)
 
 
