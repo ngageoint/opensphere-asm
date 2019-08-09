@@ -23,6 +23,7 @@ script:
 - docker exec -it emscripten bash -c 'cd /project; ./build.sh'
 # run tests locally
 - npm run test
+- commitlint-travis
 after_success:
 - npm run semantic-release
 branches:
