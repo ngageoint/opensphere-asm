@@ -53,4 +53,28 @@ describe('rhumb', function() {
     osasm._free(ptr);
   });
 
+  it('should find rhumb line intersection with a given meridian', function() {
+    const tests = [{
+      p1: [-5, 0, 15], p2: [4, 0, 12], m: 0,
+      expected: [0, 0]
+    }, {
+      p1: [178, 0, 15], p2: [-177, 0, 12], m: -180,
+      expected: [-180, 0]
+    }];
+
+    tests.forEach((test) => {
+      let result = osasm.rhumbMeridianIntersection(test.p1.slice(), test.p2.slice(), test.m);
+      expect(result[0]).toBeCloseTo(test.expected[0], 7);
+      expect(result[1]).toBe(test.expected[1]);
+
+      // flip the points around and run it again
+      const swp = test.p1;
+      test.p1 = test.p2;
+      test.p2 = swp;
+
+      result = osasm.rhumbMeridianIntersection(test.p1.slice(), test.p2.slice(), test.m);
+      expect(result[0]).toBeCloseTo(test.expected[0], 7);
+      expect(result[1]).toBe(test.expected[1]);
+    });
+  });
 });
