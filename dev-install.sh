@@ -14,7 +14,7 @@ echo "Set up emscripten sdk"
 pushd tools/emsdk-portable
 git pull
 ./emsdk install latest
-./emsdk activate latest
+./emsdk activate --embedded latest
 popd
 
 ./ci-install.sh
