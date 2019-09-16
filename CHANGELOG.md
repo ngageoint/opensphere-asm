@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/ngageoint/opensphere-asm/compare/v1.2.0...v1.2.1) (2019-09-16)
+
+
+### Performance Improvements
+
+* **bindings:** use only primitives and pointers across bindings ([b9d81f6](https://github.com/ngageoint/opensphere-asm/commit/b9d81f6)), closes [#9](https://github.com/ngageoint/opensphere-asm/issues/9)
+
 # [1.2.0](https://github.com/ngageoint/opensphere-asm/compare/v1.1.2...v1.2.0) (2019-09-16)
 
 
