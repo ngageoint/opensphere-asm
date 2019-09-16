@@ -1,101 +1,94 @@
-/**
- * @param {function(Array<number>, Array<number>):Object} func
- * @return {function(Array<number>, Array<number>):Object}
- */
-var wrapInverse = function(func) {
-  return (
-    /**
-     * @param {Array<number>} c1
-     * @param {Array<number>} c2
-     * @return {Object}
-     */
-    function(c1, c2) {
-      if (c1.length > 2) {
-        c1 = c1.slice(0, 2);
-      }
-
-      if (c2.length > 2) {
-        c2 = c2.slice(0, 2);
-      }
-
-      return func(c1, c2);
-    });
-};
-
-/**
- * @param {function(Array<number>, number, number):Array<number>} func
- * @return {function(Array<number>, number, number):Array<number>}
- */
-var wrapDirect = function(func) {
-  return (
-    /**
-     * @param {Array<number>} coord
-     * @param {number} azi1
-     * @param {number} s12
-     */
-    function(coord, azi1, s12) {
-      if (coord.length > 2) {
-        coord = coord.slice(0, 2);
-      }
-
-      return func(coord, azi1, s12);
-    });
-};
-
-/**
- * @param {function(Array<number>):*} func
- * @return {function(Array<number>):*}
- */
-var wrapSingle = function(func) {
-  return (
-    /**
-     * @param {Array<number>} p
-     * @return *
-     */
-    function(c) {
-      if (c.length > 2) {
-        c = c.slice(0, 2);
-      }
-
-      return func(c);
-    });
-};
-
-
-/**
- * @param {function(Array<number>, Array<number>, number):*} func
- * @return {function(Array<number>, Array<number>, number):*}
- */
-var wrapIntersection = function(func) {
-  return (
-    /**
-     * @param {Array<number>} p1
-     * @param {Array<number>} p2
-     * @param {number} meridian
-     */
-    function(p1, p2, meridian) {
-      if (p1.length > 2) {
-        p1 = p1.slice(0, 2);
-      }
-
-      if (p2.length > 2) {
-        p2 = p2.slice(0, 2);
-      }
-
-      return func(p1, p2, meridian);
-    });
-};
 
 Module['postRun'] = [function() {
-  Module['geodesicDirect'] = wrapDirect(Module['geodesicDirect']);
-  Module['geodesicInverse'] = wrapInverse(Module['geodesicInverse']);
-  Module['geodesicMeridianIntersection'] = wrapIntersection(Module['geodesicMeridianIntersection']);
+  var ptr = Module['_malloc'](3 * Float64Array.BYTES_PER_ELEMENT);
+  var result = new Float64Array(Module['HEAPU8'].buffer, ptr, 3);
 
-  Module['rhumbDirect'] = wrapDirect(Module['rhumbDirect']);
-  Module['rhumbInverse'] = wrapInverse(Module['rhumbInverse']);
-  Module['rhumbMeridianIntersection'] = wrapIntersection(Module['rhumbMeridianIntersection']);
+  var wrapDirect = function(func) {
+    return (
+      /**
+       * @param {Array<number>} coord
+       * @param {number} azi1
+       * @param {number} s12
+       * @param {Array<number>=} opt_result
+       * @return {Array<number>}
+       */
+      function(coord, azi1, s12, opt_result) {
+        opt_result = opt_result || [];
+        func(coord[0], coord[1], azi1, s12, ptr);
+        opt_result[0] = result[0];
+        opt_result[1] = result[1];
+        opt_result[2] = coord[2];
+        return opt_result;
+      });
+  };
 
-  Module['toMGRS'] = wrapSingle(Module['toMGRS']);
+  var wrapIntersection = function(func) {
+    return (
+      /**
+       * @param {Array<number>} p1
+       * @param {Array<number>} p2
+       * @param {number} meridian
+       * @param {Array<number>=} opt_result
+       * @return {Array<number>}
+       */
+      function(p1, p2, meridian, opt_result) {
+        opt_result = opt_result || [];
+        func(p1[0], p1[1], p2[0], p2[1], meridian, ptr);
+        opt_result[0] = result[0];
+        opt_result[1] = result[1];
+        return opt_result;
+      });
+  };
+
+  var wrapInterpolate = function(func) {
+    return (
+      /**
+       * @param {Array<number>} p1
+       * @param {Array<number>} p2
+       * @param {number} ptr
+       * @param {number} numPoints
+       */
+      function(p1, p2, ptr, numPoints) {
+        func(p1[0], p1[1], p2[0], p2[1], ptr, numPoints);
+      });
+  };
+
+
+  Module['geodesicDirect'] = wrapDirect(Module['geodesicDirect_']);
+  Module['geodesicMeridianIntersection'] = wrapIntersection(Module['geodesicMeridianIntersection_']);
+  Module['geodesicInterpolate'] = wrapInterpolate(Module['geodesicInterpolate_']);
+  Module['geodesicInverse'] = function(c1, c2, opt_result) {
+    opt_result = opt_result || {};
+    Module['geodesicInverse_'](c1[0], c1[1], c2[0], c2[1], ptr);
+    opt_result['distance'] = result[0];
+    opt_result['initialBearing'] = result[1];
+    opt_result['finalBearing'] = result[2];
+    return opt_result;
+  };
+
+  Module['rhumbDirect'] = wrapDirect(Module['rhumbDirect_']);
+  Module['rhumbMeridianIntersection'] = wrapIntersection(Module['rhumbMeridianIntersection_']);
+  Module['rhumbInterpolate'] = wrapInterpolate(Module['rhumbInterpolate_']);
+  Module['rhumbInverse'] = function(c1, c2, opt_result) {
+    opt_result = opt_result || {};
+    Module['rhumbInverse_'](c1[0], c1[1], c2[0], c2[1], ptr);
+    opt_result['distance'] = result[0];
+    opt_result['bearing'] = result[1];
+    return opt_result;
+  };
+
+
+  Module['toMGRS'] = function(c) {
+    return Module['toMGRS_'](c[0], c[1]);
+  };
+
+  Module['toLonLat'] = function(mgrs, opt_result) {
+    opt_result = opt_result || [];
+    Module['toLonLat_'](mgrs, ptr);
+    opt_result[0] = result[0];
+    opt_result[1] = result[1];
+    return opt_result;
+  };
 }];
 
 if (isBrowser()) {

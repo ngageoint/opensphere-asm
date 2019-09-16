@@ -10,11 +10,6 @@
 using namespace GeographicLib;
 using namespace emscripten;
 
-struct Coord {
-  double lon;
-  double lat;
-};
-
 
 // meridian intersection
 void normalizeLon(double& lon, double& center) {
@@ -24,23 +19,27 @@ void normalizeLon(double& lon, double& center) {
   while (lon > j) lon -= 360;
 }
 
-void ensureArgOrder(Coord& p1, Coord& p2, double& meridian) {
-  normalizeLon(p1.lon, meridian);
-  normalizeLon(p2.lon, meridian);
+void swap(double& n1, double& n2) {
+  double swp = n1;
+  n1 = n2;
+  n2 = swp;
+}
 
-  if (p2.lon < p1.lon) {
-    Coord swp = p1;
-    p1 = p2;
-    p2 = swp;
+void ensureArgOrder(double& lon1, double& lat1, double& lon2, double& lat2,  double& meridian) {
+  normalizeLon(lon1, meridian);
+  normalizeLon(lon2, meridian);
+
+  if (lon2 < lon1) {
+    swap(lon1, lon2);
+    swap(lat1, lat2);
   }
 };
 
-Coord meridianIntersection_(Coord p1, Coord p2, double meridian, double s12,
+void meridianIntersection_(double meridian, double s12, double& lon, double& lat,
     const std::function<void(double s12, double& lat, double& lon)>& position) {
   double left = 0;
   double right = s12;
   double middle;
-  double lat, lon = p1.lon;
   double lastLon = lon;
 
   while (left < right && abs(meridian - lon) > 1E-8) {
@@ -62,51 +61,40 @@ Coord meridianIntersection_(Coord p1, Coord p2, double meridian, double s12,
 
     lastLon = lon;
   }
-
-  return Coord {lon, lat};
 }
 
 
 // Geodesic
-struct GeodesicDirectResult {
-  double distance;
-  double initialBearing;
-  double finalBearing;
-};
-
-GeodesicDirectResult geodesicInverse(Coord p1, Coord p2) {
+void geodesicInverse(double lon1, double lat1, double lon2, double lat2, intptr_t ptr) {
   const Geodesic& geodesic = Geodesic::WGS84();
-  double s12, azi1, azi2;
-  geodesic.Inverse(p1.lat, p1.lon, p2.lat, p2.lon, s12, azi1, azi2);
-  return GeodesicDirectResult {s12, azi1, azi2};
+  double * result = reinterpret_cast<double *>(ptr);
+  geodesic.Inverse(lat1, lon1, lat2, lon2, result[0], result[1], result[2]);
 }
 
-Coord geodesicDirect(Coord p1, double azi1, double s12) {
+void geodesicDirect(double lon1, double lat1, double azi1, double s12, intptr_t ptr) {
   const Geodesic& geodesic = Geodesic::WGS84();
-  double lon2, lat2;
-  geodesic.Direct(p1.lat, p1.lon, azi1, s12, lat2, lon2);
-  return Coord {lon2, lat2};
+  double * result = reinterpret_cast<double *>(ptr);
+  geodesic.Direct(lat1, lon1, azi1, s12, result[1], result[0]);
 }
 
-void geodesicInterpolate_(Coord p1, Coord p2, double * flatCoords, int numPoints) {
+void geodesicInterpolate(double lon1, double lat1, double lon2, double lat2, intptr_t ptr, int numPoints) {
   const Geodesic& geodesic = Geodesic::WGS84();
-  const GeodesicLine line = geodesic.InverseLine(p1.lat, p1.lon, p2.lat, p2.lon);
+  const GeodesicLine line = geodesic.InverseLine(lat1, lon1, lat2, lon2);
+  double * result = reinterpret_cast<double *>(ptr);
   double da = line.Distance() / (numPoints - 1);
 
   for (int i = 0; i < numPoints; i++) {
-    line.Position(i * da, flatCoords[2 * i + 1], flatCoords[2 * i]);
+    line.Position(i * da, result[2 * i + 1], result[2 * i]);
   }
 }
 
-void geodesicInterpolate(Coord p1, Coord p2, intptr_t ptr, int numPoints) {
-  geodesicInterpolate_(p1, p2, reinterpret_cast<double *>(ptr), numPoints);
-}
 
-Coord geodesicMeridianIntersection(Coord p1, Coord p2, double meridian) {
-  ensureArgOrder(p1, p2, meridian);
+void geodesicMeridianIntersection(double lon1, double lat1, double lon2, double lat2, double meridian, intptr_t ptr) {
+  ensureArgOrder(lon1, lat1, lon2, lat2, meridian);
   const Geodesic& geodesic = Geodesic::WGS84();
-  const GeodesicLine line = geodesic.InverseLine(p1.lat, p1.lon, p2.lat, p2.lon);
-  return meridianIntersection_(p1, p2, meridian, line.Distance(),
+  double * result = reinterpret_cast<double *>(ptr);
+  const GeodesicLine line = geodesic.InverseLine(lat1, lon1, lat2, lon2);
+  return meridianIntersection_(meridian, line.Distance(), result[0], result[1],
       [line](double s12, double& lat, double& lon) {
         line.Position(s12, lat, lon);
       });
@@ -114,52 +102,45 @@ Coord geodesicMeridianIntersection(Coord p1, Coord p2, double meridian) {
 
 
 // Rhumb
-struct RhumbDirectResult {
-  double distance;
-  double bearing;
-};
-
-RhumbDirectResult rhumbInverse(Coord p1, Coord p2) {
+void rhumbInverse(double lon1, double lat1, double lon2, double lat2, intptr_t ptr) {
   const Rhumb& rhumb = Rhumb::WGS84();
-  double s12, azi1;
-  rhumb.Inverse(p1.lat, p1.lon, p2.lat, p2.lon, s12, azi1);
-  return RhumbDirectResult {s12, azi1};
+  double * result = reinterpret_cast<double *>(ptr);
+  rhumb.Inverse(lat1, lon1, lat2, lon2, result[0], result[1]);
 }
 
-Coord rhumbDirect(Coord p1, double azi1, double s12) {
+void rhumbDirect(double lon1, double lat1, double azi1, double s12, intptr_t ptr) {
   const Rhumb& rhumb = Rhumb::WGS84();
-  double lon2, lat2;
-  rhumb.Direct(p1.lat, p1.lon, azi1, s12, lat2, lon2);
-  return Coord {lon2, lat2};
+  double * result = reinterpret_cast<double *>(ptr);
+  rhumb.Direct(lat1, lon1, azi1, s12, result[1], result[0]);
 }
 
-RhumbLine getInverseRhumbLine(Coord p1, Coord p2, double& s12) {
+RhumbLine getInverseRhumbLine(double lon1, double lat1, double lon2, double lat2, double& s12) {
   const Rhumb& rhumb = Rhumb::WGS84();
   double azi1;
-  rhumb.Inverse(p1.lat, p1.lon, p2.lat, p2.lon, s12, azi1);
-  return rhumb.Line(p1.lat, p1.lon, azi1);
+  rhumb.Inverse(lat1, lon1, lat2, lon2, s12, azi1);
+  return rhumb.Line(lat1, lon1, azi1);
 }
 
-void rhumbInterpolate_(Coord p1, Coord p2, double * flatCoords, int numPoints) {
+void rhumbInterpolate(double lon1, double lat1, double lon2, double lat2, intptr_t ptr, int numPoints) {
   double s12;
-  const RhumbLine line = getInverseRhumbLine(p1, p2, s12);
+  const RhumbLine line = getInverseRhumbLine(lon1, lat1, lon2, lat2, s12);
+  double * result = reinterpret_cast<double *>(ptr);
   double ds = s12 / (numPoints - 1);
 
   for (int i = 0; i < numPoints; i++) {
-    line.Position(i * ds, flatCoords[2 * i + 1], flatCoords[2 * i]);
+    line.Position(i * ds, result[2 * i + 1], result[2 * i]);
   }
 }
 
-void rhumbInterpolate(Coord p1, Coord p2, intptr_t ptr, int numPoints) {
-  rhumbInterpolate_(p1, p2, reinterpret_cast<double *>(ptr), numPoints);
-}
 
-Coord rhumbMeridianIntersection(Coord p1, Coord p2, double meridian) {
-  ensureArgOrder(p1, p2, meridian);
+void rhumbMeridianIntersection(double lon1, double lat1, double lon2, double lat2, double meridian, intptr_t ptr) {
+  ensureArgOrder(lon1, lat1, lon2, lat2, meridian);
   const Rhumb& rhumb = Rhumb::WGS84();
   double s12;
-  const RhumbLine line = getInverseRhumbLine(p1, p2, s12);
-  return meridianIntersection_(p1, p2, meridian, s12,
+  const RhumbLine line = getInverseRhumbLine(lon1, lat1, lon2, lat2, s12);
+  double * result = reinterpret_cast<double *>(ptr);
+
+  return meridianIntersection_(meridian, s12, result[0], result[1],
       [line](double s12, double& lat, double& lon) {
         line.Position(s12, lat, lon);
       });
@@ -167,60 +148,42 @@ Coord rhumbMeridianIntersection(Coord p1, Coord p2, double meridian) {
 
 
 // coordinate conversion
-std::string toMGRS(Coord p) {
+std::string toMGRS(double lon, double lat) {
   int zone;
   bool northp;
   double x, y;
   std::string mgrs;
 
   // GeographicLib will throw an error for latitudes outside +/- 90. return an INVALID string instead.
-  if (abs(p.lat) > 90) {
+  if (abs(lat) > 90) {
     mgrs = "INVALID";
   } else {
-    UTMUPS::Forward(p.lat, p.lon, zone, northp, x, y);
+    UTMUPS::Forward(lat, lon, zone, northp, x, y);
     MGRS::Forward(zone, northp, x, y, 5, mgrs);
   }
 
   return mgrs;
 };
 
-Coord toLonLat(std::string mgrs) {
+void toLonLat(std::string mgrs, intptr_t ptr) {
   int zone, prec;
   bool northp;
   double x, y;
   MGRS::Reverse(mgrs, zone, northp, x, y, prec);
-  double lat, lon;
-  UTMUPS::Reverse(zone, northp, x, y, lat, lon);
-  return Coord {lon, lat};
+  double * result = reinterpret_cast<double *>(ptr);
+  UTMUPS::Reverse(zone, northp, x, y, result[1], result[0]);
 };
 
 
-
-
 EMSCRIPTEN_BINDINGS(GeographicLib) {
-  // map Coord struct to an array
-  value_array<Coord>("Coord")
-    .element(&Coord::lon)
-    .element(&Coord::lat);
-
-  // map Result struct to an object
-  value_object<GeodesicDirectResult>("GeodesicDirectResult")
-    .field("distance", &GeodesicDirectResult::distance)
-    .field("initialBearing", &GeodesicDirectResult::initialBearing)
-    .field("finalBearing", &GeodesicDirectResult::finalBearing);
-
-  value_object<RhumbDirectResult>("RhumbDirectResult")
-    .field("distance", &RhumbDirectResult::distance)
-    .field("bearing", &RhumbDirectResult::bearing);
-
-  function("geodesicDirect", &geodesicDirect);
-  function("geodesicInverse", &geodesicInverse);
-  function("geodesicInterpolate", &geodesicInterpolate);
-  function("geodesicMeridianIntersection", &geodesicMeridianIntersection);
-  function("rhumbDirect", &rhumbDirect);
-  function("rhumbInverse", &rhumbInverse);
-  function("rhumbInterpolate", &rhumbInterpolate);
-  function("rhumbMeridianIntersection", &rhumbMeridianIntersection);
-  function("toMGRS", &toMGRS);
-  function("toLonLat", &toLonLat);
+  function("geodesicDirect_", &geodesicDirect);
+  function("geodesicInverse_", &geodesicInverse);
+  function("geodesicInterpolate_", &geodesicInterpolate);
+  function("geodesicMeridianIntersection_", &geodesicMeridianIntersection);
+  function("rhumbDirect_", &rhumbDirect);
+  function("rhumbInverse_", &rhumbInverse);
+  function("rhumbInterpolate_", &rhumbInterpolate);
+  function("rhumbMeridianIntersection_", &rhumbMeridianIntersection);
+  function("toMGRS_", &toMGRS);
+  function("toLonLat_", &toLonLat);
 }
