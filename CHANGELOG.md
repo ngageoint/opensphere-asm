@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/ngageoint/opensphere-asm/compare/v1.1.2...v1.2.0) (2019-09-16)
+
+
+### Features
+
+* add node support and meridian intersection support ([b359a5c](https://github.com/ngageoint/opensphere-asm/commit/b359a5c))
+
 ## [1.1.2](https://github.com/ngageoint/opensphere-asm/compare/v1.1.1...v1.1.2) (2019-07-03)
 
 
