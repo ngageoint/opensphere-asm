@@ -61,11 +61,43 @@ var wrapSingle = function(func) {
     });
 };
 
+
+/**
+ * @param {function(Array<number>, Array<number>, number):*} func
+ * @return {function(Array<number>, Array<number>, number):*}
+ */
+var wrapIntersection = function(func) {
+  return (
+    /**
+     * @param {Array<number>} p1
+     * @param {Array<number>} p2
+     * @param {number} meridian
+     */
+    function(p1, p2, meridian) {
+      if (p1.length > 2) {
+        p1 = p1.slice(0, 2);
+      }
+
+      if (p2.length > 2) {
+        p2 = p2.slice(0, 2);
+      }
+
+      return func(p1, p2, meridian);
+    });
+};
+
 Module['postRun'] = [function() {
   Module['geodesicDirect'] = wrapDirect(Module['geodesicDirect']);
-  Module['rhumbDirect'] = wrapDirect(Module['rhumbDirect']);
   Module['geodesicInverse'] = wrapInverse(Module['geodesicInverse']);
+  Module['geodesicMeridianIntersection'] = wrapIntersection(Module['geodesicMeridianIntersection']);
+
+  Module['rhumbDirect'] = wrapDirect(Module['rhumbDirect']);
   Module['rhumbInverse'] = wrapInverse(Module['rhumbInverse']);
+  Module['rhumbMeridianIntersection'] = wrapIntersection(Module['rhumbMeridianIntersection']);
+
   Module['toMGRS'] = wrapSingle(Module['toMGRS']);
 }];
-window['osasm'] = Module;
+
+if (isBrowser()) {
+  window['osasm'] = Module;
+}
