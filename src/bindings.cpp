@@ -40,6 +40,7 @@ void meridianIntersection_(double meridian, double s12, double& lon, double& lat
   double left = 0;
   double right = s12;
   double middle;
+  lon = -99999;
   double lastLon = lon;
 
   while (left < right && abs(meridian - lon) > 1E-8) {
@@ -94,7 +95,7 @@ void geodesicMeridianIntersection(double lon1, double lat1, double lon2, double 
   const Geodesic& geodesic = Geodesic::WGS84();
   double * result = reinterpret_cast<double *>(ptr);
   const GeodesicLine line = geodesic.InverseLine(lat1, lon1, lat2, lon2);
-  return meridianIntersection_(meridian, line.Distance(), result[0], result[1],
+  meridianIntersection_(meridian, line.Distance(), result[0], result[1],
       [line](double s12, double& lat, double& lon) {
         line.Position(s12, lat, lon);
       });
@@ -139,8 +140,7 @@ void rhumbMeridianIntersection(double lon1, double lat1, double lon2, double lat
   double s12;
   const RhumbLine line = getInverseRhumbLine(lon1, lat1, lon2, lat2, s12);
   double * result = reinterpret_cast<double *>(ptr);
-
-  return meridianIntersection_(meridian, s12, result[0], result[1],
+  meridianIntersection_(meridian, s12, result[0], result[1],
       [line](double s12, double& lat, double& lon) {
         line.Position(s12, lat, lon);
       });
