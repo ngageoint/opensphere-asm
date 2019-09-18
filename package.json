@@ -1,6 +1,6 @@
 {
   "name": "opensphere-asm",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "WebAssembly and asm.js module for OpenSphere. Built with [emscripten](https://github.com/kripken/emscripten).",
   "main": "dist/os-load.js",
   "scripts": {

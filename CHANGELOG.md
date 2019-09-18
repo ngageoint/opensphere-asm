@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/ngageoint/opensphere-asm/compare/v1.2.1...v1.2.2) (2019-09-18)
+
+
+### Bug Fixes
+
+* **bindings:** prevent accidental shortcut ([951202c](https://github.com/ngageoint/opensphere-asm/commit/951202c))
+
 ## [1.2.1](https://github.com/ngageoint/opensphere-asm/compare/v1.2.0...v1.2.1) (2019-09-16)
 
 
