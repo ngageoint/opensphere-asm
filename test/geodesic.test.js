@@ -80,8 +80,20 @@ describe('geodesic', function() {
   it('should correctly solve the direct geodesic problem', function() {
     data.forEach(function(d) {
       var result = osasm.geodesicDirect(d.p1, d.initialBearing, d.distance);
+      expect(result.length).toBe(d.p2.length);
       expect(result[0]).toBeCloseTo(d.p2[0], degPrecision);
       expect(result[1]).toBeCloseTo(d.p2[1], degPrecision);
+
+      result = d.p2.slice();
+      result[2] = 987;
+      result[3] = 543;
+
+      var r = osasm.geodesicDirect(d.p1, d.initialBearing, d.distance, result);
+      expect(r).toBe(result);
+      expect(result[0]).toBeCloseTo(d.p2[0], degPrecision);
+      expect(result[1]).toBeCloseTo(d.p2[1], degPrecision);
+      expect(result[2]).toBe(987);
+      expect(result[3]).toBe(543);
     });
   });
 
