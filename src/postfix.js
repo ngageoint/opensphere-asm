@@ -17,7 +17,6 @@ Module['postRun'] = [function() {
         func(coord[0], coord[1], azi1, s12, ptr);
         opt_result[0] = result[0];
         opt_result[1] = result[1];
-        opt_result[2] = coord[2];
         return opt_result;
       });
   };
