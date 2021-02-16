@@ -10,8 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: trzeci/emscripten:latest
+    container: emscripten/emsdk:latest
 
     steps:
     - uses: actions/checkout@v2
@@ -23,6 +22,9 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 14.x
+
+    - name: Install Yarn
+      run: npm install -g yarn
 
     - name: Get Yarn Cache Directory
       id: yarn-cache-dir-path
