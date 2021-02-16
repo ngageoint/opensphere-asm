@@ -35,7 +35,9 @@ jobs:
       uses: browser-actions/setup-chrome@latest
 
     - name: Set CHROME_BIN environment variable
-      run: echo "CHROME_BIN=$(which chrome)" >> $GITHUB_ENV
+      run: |
+        echo "CHROME_BIN=$(which chrome)" >> $GITHUB_ENV
+        echo "CHROME_BIN = $CHROME_BIN"
 
     - name: Install Node.js
       uses: actions/setup-node@v2
