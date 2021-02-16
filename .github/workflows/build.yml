@@ -37,7 +37,7 @@ jobs:
     - name: Set CHROME_BIN environment variable
       run: |
         echo "CHROME_BIN=$(which chrome)" >> $GITHUB_ENV
-        echo "CHROME_BIN = $CHROME_BIN"
+        echo "CHROME_BIN = ${{ env.CHROME_BIN }}"
 
     - name: Install Node.js
       uses: actions/setup-node@v2
@@ -70,6 +70,8 @@ jobs:
 
     - name: Unit Tests
       run: yarn test
+      env:
+        CHROME_BIN: ${{ env.CHROME_BIN }}
 
     - name: Release
       if: github.ref == 'refs/heads/master'
