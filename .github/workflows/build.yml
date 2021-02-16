@@ -70,8 +70,6 @@ jobs:
 
     - name: Unit Tests
       run: yarn test
-      env:
-        CHROME_BIN: $(which chrome)
 
     - name: Release
       if: github.ref == 'refs/heads/master'
