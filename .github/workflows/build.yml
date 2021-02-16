@@ -18,6 +18,10 @@ jobs:
         fetch-depth: 0
         persist-credentials: false
 
+    #
+    # Chrome dependency list:
+    # https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#chrome-headless-doesnt-launch-on-unix
+    #
     - name: Install Chrome Deps
       run: |
         sudo apt-get update
@@ -29,6 +33,9 @@ jobs:
 
     - name: Install Chrome
       uses: browser-actions/setup-chrome@latest
+
+    - name: Set CHROME_BIN environment variable
+      run: echo "CHROME_BIN=$(which chrome)" >> $GITHUB_ENV
 
     - name: Install Node.js
       uses: actions/setup-node@v2
@@ -61,6 +68,8 @@ jobs:
 
     - name: Unit Tests
       run: yarn test
+      env:
+        CHROME_BIN: $(which chrome)
 
     - name: Release
       if: github.ref == 'refs/heads/master'
