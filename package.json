@@ -6,7 +6,8 @@
   "scripts": {
     "build": "./build.sh",
     "test": "karma start --single-run",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "postinstall": "husky install"
   },
   "files": [
     "README.md",
@@ -67,17 +68,12 @@
     "@semantic-release/github": "^7.2.0",
     "@semantic-release/npm": "^7.0.10",
     "@semantic-release/release-notes-generator": "^9.0.1",
-    "husky": "^3.0.1",
+    "husky": "^7.0.4",
     "jasmine-core": "^3.3.0",
     "karma": "^4.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^2.0.1",
     "karma-spec-reporter": "^0.0.32",
     "semantic-release": "^17.3.9"
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   }
 }
