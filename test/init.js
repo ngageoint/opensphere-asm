@@ -1,17 +1,29 @@
-beforeAll(function(done) {
-  originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 5500;
+const originalJasmineTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
 
-  if (!window.osasm) {
-    setTimeout(function() {
-      expect(!!window.osasm && !!window.osasm.geodesicInverse).toBe(true);
-      done();
-    }, 4000);
-  } else {
-    done();
-  }
+beforeAll(function() {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 5500;
 });
 
 afterAll(function() {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = originalJasmineTimeout;
 });
+
+if (!window.osasm || !window.osasm.geodesicDirect) {
+  beforeEach(function(done) {
+    const interval = 100;
+    const timeout = 4000;
+    let waited = 0;
+
+    const osasmReady = () => !!window.osasm && !!osasm.geodesicDirect && !!osasm.toMGRS;
+    const waitForOsasm = () => {
+      if (!osasmReady() && waited < timeout) {
+        waited += interval;
+        setTimeout(waitForOsasm, interval);
+      } else {
+        done();
+      }
+    };
+
+    waitForOsasm();
+  });
+}
